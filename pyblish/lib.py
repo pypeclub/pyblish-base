@@ -53,22 +53,31 @@ class MessageHandler(logging.Handler):
             self.records.append(record)
 
 
-def extract_traceback(exception):
-    """Inject current traceback and store in exception"""
+def extract_traceback(exception, fname=None):
+    """Inject current traceback and store in exception.traceback.
+    Also storing the formatted traceback on exception.formtatted_traceback.
+    Arguments:
+        exception (Exception): Exception object
+        fname (str): Optionally provide a file name for the exception.
+            This is necessary to inject the correct file path in the traceback.
+            If plugins are registered through `api.plugin.discover`, they only
+            show "<string>" instead of the actual source file.
+    """
     exc_type, exc_value, exc_traceback = sys.exc_info()
     exception.traceback = traceback.extract_tb(exc_traceback)[-1]
 
-    trc_lines = traceback.format_exception(exc_type, exc_value, exc_traceback)
-    fname, line_no, func, exc = exception.traceback
-    error_info = {
-        'msg': str(exception),
-        'filename': str(fname),
-        'lineno': str(line_no),
-        'func': str(func),
-        'traceback': ''.join(trc_lines)
-    }
+    formatted_traceback = ''.join(traceback.format_exception(
+        exc_type, exc_value, exc_traceback))
+    if 'File "<string>", line ' in formatted_traceback and fname is not None:
+        _, lineno, func, msg = exception.traceback
+        fname = os.path.abspath(fname)
+        exception.traceback = (fname, lineno, func, msg)
+        formatted_traceback = formatted_traceback.replace(
+            'File "<string>", line ',
+            'File "{0}", line'.format(fname))
+    exception.formatted_traceback = formatted_traceback
+
     del(exc_type, exc_value, exc_traceback)
-    return error_info
 
 def time():
     """Return ISO formatted string representation of current UTC time."""

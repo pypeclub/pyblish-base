@@ -592,9 +592,9 @@ def __implicit_process(plugin, context, instance=None, action=None):
     except Exception as error:
         lib.emit("pluginFailed", plugin=plugin, context=context,
                  instance=instance, error=error)
-        error_info = lib.extract_traceback(error)
+        lib.extract_traceback(error, plugin.__module__)
         result["error"] = error
-        result["error_info"] = error_info
+        log.exception(result["error"].formatted_traceback)
 
     __end = time.time()
 
@@ -648,9 +648,9 @@ def repair(plugin, context, instance=None):
             provider.invoke(plugin.repair)
             result["success"] = True
     except Exception as error:
-        error_info = lib.extract_traceback(error)
+        lib.extract_traceback(error, plugin.__module__)
         result["error"] = error
-        result["error_info"] = error_info
+        log.exception(result["error"].formatted_traceback)
 
     __end = time.time()
 
