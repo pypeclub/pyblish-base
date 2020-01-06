@@ -523,10 +523,8 @@ def __explicit_process(plugin, context, instance=None, action=None):
         # http://stackoverflow.com/a/11417308/478949
         lib.emit("pluginFailed", plugin=plugin, context=context,
                  instance=instance, error=error)
-
-        error_info = lib.extract_traceback(error)
+        lib.extract_traceback(error, plugin.__module__)
         result["error"] = error
-        result["error_info"] = error_info
 
     __end = time.time()
 
