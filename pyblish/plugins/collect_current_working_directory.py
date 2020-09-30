@@ -10,4 +10,5 @@ class CollectCurrentWorkingDirectory(pyblish.api.ContextPlugin):
     label = "Current working directory"
 
     def process(self, context):
-        context.data['cwd'] = os.getcwd()
+        if 'cwd' not in context.data:
+            context.data['cwd'] = os.getcwd()

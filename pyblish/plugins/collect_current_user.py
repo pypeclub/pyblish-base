@@ -10,4 +10,5 @@ class CollectCurrentUser(pyblish.api.ContextPlugin):
     label = "Current user"
 
     def process(self, context):
-        context.data['user'] = getpass.getuser()
+        if 'user' not in context.data:
+            context.data['user'] = getpass.getuser()

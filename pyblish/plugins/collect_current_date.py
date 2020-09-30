@@ -10,4 +10,5 @@ class CollectCurrentDate(pyblish.api.ContextPlugin):
     label = "Current date"
 
     def process(self, context):
-        context.data['date'] = pyblish.lib.time()
+        if 'date' not in context.data:
+            context.data['date'] = pyblish.lib.time()
